@@ -94,8 +94,9 @@ public class MainActivity extends AppCompatActivity implements
             try {
                 sampleMediaPlayer.reset();
                 sampleMediaPlayer.setDataSource(videoPath);
-                sampleMediaPlayer.prepare();
-                sampleMediaPlayer.start();
+                sampleMediaPlayer.prepareAsync();
+                TextView t = (TextView)findViewById(R.id.textview_time);
+                t.setText("Buffering...");
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -117,6 +118,8 @@ public class MainActivity extends AppCompatActivity implements
         TextView t = (TextView)findViewById(R.id.textview_time);
         MediaPlayer.TrackInfo info[] = mp.getTrackInfo();
         t.setText(info[0].toString());
+
+        sampleMediaPlayer.start();
 
         // Cancel previous Timer
         if (playbackTimer != null) {
