@@ -9,10 +9,34 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements
         MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
     private MediaPlayer sampleMediaPlayer;
+    private final Runnable playbackTimeUpdateTask = new Runnable() {
+        public void run() {
+            if (sampleMediaPlayer.isPlaying()) {
+                int playtime;
+                int duration;
+                TextView textView;
+                textView = (TextView)findViewById(R.id.textview_time);
+                duration = sampleMediaPlayer.getDuration();
+                playtime = sampleMediaPlayer.getCurrentPosition();
+                textView.setText(String.valueOf(playtime) + " ms / " + String.valueOf(duration + " ms"));
+            }
+        }
+    };
+    class PlaybackTimerTask extends TimerTask {
+        @Override
+        public void run() {
+            // Updating TextView must be in UI thread
+            runOnUiThread(playbackTimeUpdateTask);
+        }
+    }
+    private Timer playbackTimer = null;
+    private PlaybackTimerTask timerTask = null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -70,5 +94,16 @@ public class MainActivity extends AppCompatActivity implements
         TextView t = (TextView)findViewById(R.id.textview_time);
         MediaPlayer.TrackInfo info[] = mp.getTrackInfo();
         t.setText(info[0].toString());
+
+        // Cancel previous Timer
+        if (playbackTimer != null) {
+            playbackTimer.cancel();
+            timerTask.cancel();
+        }
+        // Once Timer is canceled, it is required to create a new timer.
+        playbackTimer = new Timer();
+        timerTask = new PlaybackTimerTask();
+        // Timer starts after 1000 ms with 1000 ms period
+        playbackTimer.schedule(timerTask, 1000, 1000);
     }
 }
