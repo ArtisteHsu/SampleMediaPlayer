@@ -1,18 +1,22 @@
 package com.example.artiste.samplemediaplayer;
 
-import android.support.v7.app.ActionBarActivity;
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
-
+    private MediaPlayer sampleMediaPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        sampleMediaPlayer = new MediaPlayer();
     }
 
     @Override
@@ -30,7 +34,20 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_audio) {
+            AssetFileDescriptor afd;
+            afd = getBaseContext().getResources().openRawResourceFd(R.raw.handel_water_music);
+            try {
+                sampleMediaPlayer.reset();
+                sampleMediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getDeclaredLength());
+                sampleMediaPlayer.prepare();
+                sampleMediaPlayer.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return true;
+        }
+        if (id == R.id.action_video) {
             return true;
         }
 
