@@ -6,10 +6,12 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements
+        MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
     private MediaPlayer sampleMediaPlayer;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -17,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         sampleMediaPlayer = new MediaPlayer();
+        sampleMediaPlayer.setOnCompletionListener(this);
+        sampleMediaPlayer.setOnPreparedListener(this);
     }
 
     @Override
@@ -52,5 +56,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    // Implementation of MediaPlayer Listener callbacks
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        TextView t = (TextView)findViewById(R.id.textview_time);
+        t.setText("Complete");
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mp) {
+        TextView t = (TextView)findViewById(R.id.textview_time);
+        MediaPlayer.TrackInfo info[] = mp.getTrackInfo();
+        t.setText(info[0].toString());
     }
 }
