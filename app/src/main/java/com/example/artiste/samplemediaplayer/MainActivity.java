@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.widget.TextView;
 
 import java.io.IOException;
@@ -13,7 +15,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class MainActivity extends AppCompatActivity implements
-        MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener {
+        MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener,
+        SurfaceHolder.Callback {
     private MediaPlayer sampleMediaPlayer;
     private final Runnable playbackTimeUpdateTask = new Runnable() {
         public void run() {
@@ -37,6 +40,10 @@ public class MainActivity extends AppCompatActivity implements
     }
     private Timer playbackTimer = null;
     private PlaybackTimerTask timerTask = null;
+
+    // SurfaceView and SurfaceHolder for MediaPlayer video surface
+    private SurfaceView videoSurfaceView;
+    private SurfaceHolder surfaceHolder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +52,12 @@ public class MainActivity extends AppCompatActivity implements
         sampleMediaPlayer = new MediaPlayer();
         sampleMediaPlayer.setOnCompletionListener(this);
         sampleMediaPlayer.setOnPreparedListener(this);
+
+        // Set MediaPlayer video playback surface
+        videoSurfaceView = (SurfaceView)findViewById(R.id.surfaceView);
+        surfaceHolder = videoSurfaceView.getHolder();
+        // MediaPlayer.setDisplay() will be called in :surfaceCreated() callback
+        surfaceHolder.addCallback(this);
     }
 
     @Override
@@ -76,6 +89,16 @@ public class MainActivity extends AppCompatActivity implements
             return true;
         }
         if (id == R.id.action_video) {
+            String videoPath;
+            videoPath = "http://ie.microsoft.com/TEStdrive/Graphics/VideoFormatSupport/big_buck_bunny_trailer_480p_baseline.mp4";
+            try {
+                sampleMediaPlayer.reset();
+                sampleMediaPlayer.setDataSource(videoPath);
+                sampleMediaPlayer.prepare();
+                sampleMediaPlayer.start();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return true;
         }
 
@@ -105,5 +128,21 @@ public class MainActivity extends AppCompatActivity implements
         timerTask = new PlaybackTimerTask();
         // Timer starts after 1000 ms with 1000 ms period
         playbackTimer.schedule(timerTask, 1000, 1000);
+    }
+
+    //  Implementation of SurfaceHolder callbacks
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        sampleMediaPlayer.setDisplay(holder);
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+
     }
 }
