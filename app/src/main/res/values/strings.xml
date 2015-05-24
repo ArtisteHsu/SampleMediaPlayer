@@ -2,5 +2,7 @@
     <string name="app_name">SampleMediaPlayer</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="action_play">Play</string>
+    <string name="action_audio">Audio</string>
+    <string name="action_video">Video</string>
 </resources>
